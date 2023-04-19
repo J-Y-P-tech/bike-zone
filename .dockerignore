@@ -15,5 +15,3 @@ app/*/*/*/__pycache__/
 .venv/
 venv/
 
-# Admin
-app/static/

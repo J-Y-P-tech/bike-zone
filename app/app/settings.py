@@ -34,6 +34,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
 
     'pages',
+    'bikes',
+    'ckeditor',
 
     'django.contrib.admin',
     'django.contrib.auth',

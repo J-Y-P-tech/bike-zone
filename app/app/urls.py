@@ -21,6 +21,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
+    path('bikes/', include('bikes.urls')),
 ]
 """
 Django development server by default doesn't serve these files for us.

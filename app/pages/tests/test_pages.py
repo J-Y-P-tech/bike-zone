@@ -1,4 +1,3 @@
-from django.urls import reverse
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from pages import models
@@ -7,7 +6,7 @@ import datetime
 
 
 class TestWithoutModels(TestCase):
-    """ Test unauthenticated requests """
+    """ Test requests without comparing information from models"""
 
     def test_home_page(self):
         """ Test that home page loads correctly """
@@ -28,6 +27,7 @@ class TestWithoutModels(TestCase):
 
         # Use reverse to generate the URL for the home page
         url = reverse('about')
+        # print(f"url = reverse('about')   {url}")
 
         # Issue a GET request to the generated URL
         response = self.client.get(url)

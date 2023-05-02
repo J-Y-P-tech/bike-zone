@@ -9,9 +9,6 @@
 credentials.json
 original_credentials.json
 
-# Command download
-app/dmnld/*
-
 # Django #
 *.log
 *.pot

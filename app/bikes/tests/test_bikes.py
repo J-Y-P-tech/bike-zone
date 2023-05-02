@@ -1,5 +1,14 @@
 from django.urls import reverse
 from django.test import SimpleTestCase, TestCase
+from django.core.files.storage import default_storage
+from bikes.management.commands.populate_data import Command
+from django.db import transaction
+from unittest.mock import patch
+from bikes.models import Bike
+from django.core.files import File
+from PIL import Image
+from io import BytesIO
+import os
 import datetime
 
 
@@ -38,3 +47,42 @@ class TestBaseTemplate(TestCase):
         url = reverse('bikes')
         response = self.client.get(url)
         self.helper_method(response)
+
+
+class TestBikesData(TestCase):
+    """
+    """
+
+    @patch('bikes.management.commands.populate_data.ddg.download')
+    def setUp(self, mock_download):
+        """ SetUp method will populate the test database with test data.
+        Image download will be mocked to save time and resources."""
+        self.command = Command()
+        self.folder_path = 'dwnld'
+        self.filename = "black_image.jpg"
+
+        def side_effect(*args, **kwargs):
+            """ This functions mocks the behaviour og ddg by creating image
+            1x1 pixels instead of downloading it."""
+            max_urls = kwargs.get('max_urls', 0)
+            image = Image.new('RGB', (1, 1), color='black')
+            file_path = os.path.join(self.folder_path, self.filename)
+            image.save(file_path)
+
+        # Set the side_effect of mock_download to our custom function
+        mock_download.side_effect = side_effect
+
+        # Run the command
+        self.command.populate_bikes()
+
+    def tearDown(self):
+        self.command.clear_all_bikes_data()
+
+    def test_humanize_exists(self):
+        """ Test that humanize library is available on template
+        and the prices are formatted correctly """
+        url = reverse('bikes')
+        response = self.client.get(url)
+        self.assertContains(response, '4,000')
+
+

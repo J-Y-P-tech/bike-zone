@@ -8,7 +8,6 @@ from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.core.files.storage import default_storage
 
-folder_path = 'dwnld'
 bikes_data = [
     {
         "bike_title": "BMW S1000RR",
@@ -314,131 +313,6 @@ bikes_data = [
 ]
 
 
-def delete_all_files_in_folder(folder_path):
-    """
-    Deletes all files and folders located in a specified folder path.
-    Args: folder_path (str): The path to the folder to be emptied.
-    Returns: None
-    Raises: None
-    """
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-            elif os.path.isdir(file_path):
-                os.rmdir(file_path)
-        except Exception as e:
-            print(f"Failed to delete {file_path}. Reason: {e}")
-
-
-def clear_all_bikes_data():
-    """
-    Deletes all bike records from the database and corresponding images
-    from the docker volume.
-    This function gets all the bike records from the database and loops
-    through each record.
-    For each record, it checks if the corresponding bike photos exist in
-    the docker volume and deletes them if they do.
-    Then, it deletes the bike record from the database. This function
-    should be called with caution
-    as it permanently deletes all bike data and corresponding images.
-
-    Raises: Any exception raised during the deletion of bike photos
-    or bike records will be propagated.
-    Returns: None
-    """
-
-    with transaction.atomic():
-        # Get all the bike records
-        bikes = Bike.objects.all()
-        # Loop through each bike record
-        for bike in bikes:
-            # Delete the bike photos from the docker volume if they exist
-            if bike.bike_photo:
-                default_storage.delete(bike.bike_photo.name)
-            if bike.bike_photo_1:
-                default_storage.delete(bike.bike_photo_1.name)
-            if bike.bike_photo_2:
-                default_storage.delete(bike.bike_photo_2.name)
-            if bike.bike_photo_3:
-                default_storage.delete(bike.bike_photo_3.name)
-            if bike.bike_photo_4:
-                default_storage.delete(bike.bike_photo_4.name)
-            # Delete the bike record from the database
-            bike.delete()
-
-
-def populate_bikes():
-    """
-    Populates the database with bikes based on data from a pre-defined list
-    (`bikes_data`). For each bike in the list, downloads up to 5 images from
-    DuckDuckGo based on the bike's attributes (title, color, and year),
-    saves the images to disk, and creates a new Bike object in the database
-    with the bike's attributes and image files.
-    If the folder where the images are saved is empty, creates a blue
-    square image and saves it as the bike's primary image (`bike_photo`).
-    If there are more than one image in the folder, the function saves them as
-    additional images (`bike_photo_1`, `bike_photo_2`, etc.) associated with
-    the bike record.
-    """
-
-    # loop through the bikes_data list
-    for bike_data in bikes_data:
-
-        # delete all data from dwnld
-        delete_all_files_in_folder(folder_path)
-
-        ddg.download(bike_data['bike_title'] + " color " +
-                     bike_data['color'] + " year " +
-                     str(bike_data['year']),
-                     max_urls=5,
-                     folder='dwnld')
-
-        # create a new Bike object with the data from the JSON
-        bike = Bike.objects.create(
-            bike_title=bike_data['bike_title'],
-            state=bike_data['state'],
-            city=bike_data['city'],
-            color=bike_data['color'],
-            model=bike_data['model'],
-            year=bike_data['year'],
-            condition=bike_data['condition'],
-            price=bike_data['price'],
-            description=bike_data['description'],
-            body_style=bike_data['body_style'],
-            engine=bike_data['engine'],
-            transmission=bike_data['transmission'],
-            miles=bike_data['miles'],
-            vin_no=bike_data['vin_no'],
-            milage=bike_data['milage'],
-            fuel_type=bike_data['fuel_type'],
-            no_of_owners=bike_data['no_of_owners'],
-            is_featured=bike_data['is_featured']
-        )
-
-        # check if the folder contains any images
-        if not os.listdir(folder_path):
-            # if no images, create a blue square image and save it as bike_photo
-            blue_image = Image.new('RGB', (600, 600), color='blue')
-            image_file = File(open('/path/to/blue_image.jpg', 'rb'))
-            blue_image.save(image_file, format='JPEG')
-            bike.bike_photo.save('blue_image.jpg', image_file)
-        else:
-            # if there are images, use the first one as bike_photo
-            first_image = os.listdir(folder_path)[0]
-            image_file = File(open(os.path.join(folder_path, first_image), 'rb'))
-            bike.bike_photo.save(first_image, image_file)
-
-            # if there are more than one images, save them to bike_photo_1, bike_photo_2, etc.
-            if len(os.listdir(folder_path)) > 1:
-                for i, image_path in enumerate(os.listdir(folder_path)[1:5], start=1):
-                    image_file = File(open(os.path.join(folder_path, image_path), 'rb'))
-                    setattr(bike, f'bike_photo_{i}', image_file)
-
-        bike.save()
-
-
 class Command(BaseCommand):
     """ Django command to populate the Bike model.
 
@@ -451,8 +325,139 @@ class Command(BaseCommand):
     saved to disk, and associated with the bike record.
     """
 
+    def __init__(self):
+        self.folder_path = 'dwnld'
+        self.filename = "blue_image.jpg"
+        self.bikes_data = bikes_data
+        self.bike_data = []
+
+    def delete_all_files_in_folder(self):
+        """
+        Deletes all files and folders located in a specified folder path.
+        Args: folder_path (str): The path to the folder to be emptied.
+        Returns: None
+        Raises: None
+        """
+        for filename in os.listdir(self.folder_path):
+            file_path = os.path.join(self.folder_path, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    os.rmdir(file_path)
+            except Exception as e:
+                print(f"Failed to delete {file_path}. Reason: {e}")
+
+    @staticmethod
+    def clear_all_bikes_data():
+        """
+        Deletes all bike records from the database and corresponding images
+        from the docker volume.
+        This function gets all the bike records from the database and loops
+        through each record.
+        For each record, it checks if the corresponding bike photos exist in
+        the docker volume and deletes them if they do.
+        Then, it deletes the bike record from the database. This function
+        should be called with caution
+        as it permanently deletes all bike data and corresponding images.
+
+        Raises: Any exception raised during the deletion of bike photos
+        or bike records will be propagated.
+        Returns: None
+        """
+
+        with transaction.atomic():
+            # Get all the bike records
+            bikes = Bike.objects.all()
+            # Loop through each bike record
+            for bike in bikes:
+                # Delete the bike photos from the docker volume if they exist
+                if bike.bike_photo:
+                    default_storage.delete(bike.bike_photo.name)
+                if bike.bike_photo_1:
+                    default_storage.delete(bike.bike_photo_1.name)
+                if bike.bike_photo_2:
+                    default_storage.delete(bike.bike_photo_2.name)
+                if bike.bike_photo_3:
+                    default_storage.delete(bike.bike_photo_3.name)
+                if bike.bike_photo_4:
+                    default_storage.delete(bike.bike_photo_4.name)
+                # Delete the bike record from the database
+                bike.delete()
+
+    def populate_bikes(self):
+        """
+        Populates the database with bikes based on data from a pre-defined list
+        (`bikes_data`). For each bike in the list, downloads up to 5 images from
+        DuckDuckGo based on the bike's attributes (title, color, and year),
+        saves the images to disk, and creates a new Bike object in the database
+        with the bike's attributes and image files.
+        If the folder where the images are saved is empty, creates a blue
+        square image and saves it as the bike's primary image (`bike_photo`).
+        If there are more than one image in the folder, the function saves them as
+        additional images (`bike_photo_1`, `bike_photo_2`, etc.) associated with
+        the bike record.
+        """
+
+        # loop through the bikes_data list
+        for bike_data in bikes_data:
+
+            # delete all data from dwnld
+            self.delete_all_files_in_folder()
+
+            self.bike_data = bike_data
+
+            ddg.download(bike_data['bike_title'] + " color " +
+                         bike_data['color'] + " year " +
+                         str(bike_data['year']),
+                         max_urls=5,
+                         folder='dwnld')
+
+            # create a new Bike object with the data from the JSON
+            bike = Bike.objects.create(
+                bike_title=bike_data['bike_title'],
+                state=bike_data['state'],
+                city=bike_data['city'],
+                color=bike_data['color'],
+                model=bike_data['model'],
+                year=bike_data['year'],
+                condition=bike_data['condition'],
+                price=bike_data['price'],
+                description=bike_data['description'],
+                body_style=bike_data['body_style'],
+                engine=bike_data['engine'],
+                transmission=bike_data['transmission'],
+                miles=bike_data['miles'],
+                vin_no=bike_data['vin_no'],
+                milage=bike_data['milage'],
+                fuel_type=bike_data['fuel_type'],
+                no_of_owners=bike_data['no_of_owners'],
+                is_featured=bike_data['is_featured']
+            )
+
+            # check if the folder contains any images
+            if not os.listdir(self.folder_path):
+                image = Image.new('RGB', (600, 600), color='blue')
+                file_path = os.path.join(self.folder_path, self.filename)
+                image.save(file_path)
+                first_image = os.listdir(self.folder_path)[0]
+                image_file = File(open(os.path.join(self.folder_path, first_image), 'rb'))
+                bike.bike_photo.save(first_image, image_file)
+            else:
+                # if there are images, use the first one as bike_photo
+                first_image = os.listdir(self.folder_path)[0]
+                image_file = File(open(os.path.join(self.folder_path, first_image), 'rb'))
+                bike.bike_photo.save(first_image, image_file)
+
+                # if there are more than one images, save them to bike_photo_1, bike_photo_2, etc.
+                if len(os.listdir(self.folder_path)) > 1:
+                    for i, image_path in enumerate(os.listdir(self.folder_path)[1:5], start=1):
+                        image_file = File(open(os.path.join(self.folder_path, image_path), 'rb'))
+                        setattr(bike, f'bike_photo_{i}', image_file)
+
+            bike.save()
+
     def handle(self, *args, **options):
         """ Entrypoint for command. """
-        clear_all_bikes_data()
-        clear_all_bikes_data()
-        populate_bikes()
+        self.clear_all_bikes_data()
+        self.populate_bikes()

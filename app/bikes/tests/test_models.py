@@ -3,6 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from bikes.models import Bike
 from django.urls import reverse
 
+
 class TestBikeModel(TestCase):
     """Tests that Bike Model is implemented correctly"""
 

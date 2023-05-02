@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} | Our Bikes Inventory{% endblock %}
 {% block content %}
+{% load humanize %}
 
 <!-- Sub banner start -->
 <div class="sub-banner overview-bgi">
@@ -30,10 +31,10 @@
                     <div class="col-lg-6 col-md-6">
                         <div class="car-box-3">
                             <div class="car-thumbnail">
-                                <a href="#" class="car-img">
+                                <a href="{% url 'bike_detail' bike.id %}" class="car-img">
                                     <div class="tag-2 bg-active">Featured</div>
                                     <div class="price-box">
-                                        <span>$ {{ bike.price }}</span>
+                                        <span>$ {{ bike.price | intcomma }}</span>
                                     </div>
                                     <img class="d-block w-100" src="{{ bike.bike_photo.url }}" alt="car">
                                 </a>
@@ -70,16 +71,16 @@
                             </div>
                             <div class="detail">
                                 <h1 class="title">
-                                    <a href="#">{{ bike.bike_title|truncatechars:22 }}</a>
+                                    <a href="{% url 'bike_detail' bike.id %}">{{ bike.bike_title|truncatechars:22 }}</a>
                                 </h1>
                                 <div class="location">
-                                    <a href="#">
+                                    <a href="{% url 'bike_detail' bike.id %}">
                                         <i class="flaticon-pin"></i>{{ bike.state }}, {{ bike.city }}
                                     </a>
                                 </div>
                                 <ul class="facilities-list clearfix">
                                     <li>{{bike.fuel_type}}</li>
-                                    <li>{{bike.miles }} km</li>
+                                    <li>{{bike.miles | intcomma }} km</li>
                                     <li>{{bike.transmission}}</li>
                                     <li>{{bike.body_style}}</li>
                                     <li>{{bike.color}}</li>

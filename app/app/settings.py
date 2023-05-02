@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'pages',
     'bikes',
     'ckeditor',
+    'django.contrib.humanize',
 
     'django.contrib.admin',
     'django.contrib.auth',

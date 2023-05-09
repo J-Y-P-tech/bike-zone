@@ -8,13 +8,16 @@ from django.core.files import File
 from PIL import Image
 from io import BytesIO
 import os
+import tempfile
 
 
 class TestPopulateBikesCommand(TestCase):
 
     def setUp(self):
         self.command = Command()
-        self.folder_path = 'dwnld'
+        # self.folder_path = 'dwnld'
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.folder_path = self.temp_dir.name
         self.filename = "black_image.jpg"
 
     def tearDown(self):

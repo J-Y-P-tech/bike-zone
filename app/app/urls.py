@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
     path('bikes/', include('bikes.urls')),
+    path('accounts/', include('accounts.urls')),
 ]
 """
 Django development server by default doesn't serve these files for us.

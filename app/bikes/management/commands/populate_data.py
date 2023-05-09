@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.core.files.storage import default_storage
+import tempfile
 
 bikes_data = [
     {
@@ -326,7 +327,9 @@ class Command(BaseCommand):
     """
 
     def __init__(self):
-        self.folder_path = 'dwnld'
+        # self.folder_path = 'dwnld'
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.folder_path = self.temp_dir.name
         self.filename = "blue_image.jpg"
         self.bikes_data = bikes_data
         self.bike_data = []

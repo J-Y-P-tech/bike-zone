@@ -10,6 +10,7 @@ from PIL import Image
 from io import BytesIO
 import os
 import datetime
+import tempfile
 
 
 class TestWithoutModels(TestCase):
@@ -58,7 +59,9 @@ class TestBikesData(TestCase):
         """ SetUp method will populate the test database with test data.
         Image download will be mocked to save time and resources."""
         self.command = Command()
-        self.folder_path = 'dwnld'
+        # self.folder_path = 'dwnld'
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.folder_path = self.temp_dir.name
         self.filename = "black_image.jpg"
 
         def side_effect(*args, **kwargs):

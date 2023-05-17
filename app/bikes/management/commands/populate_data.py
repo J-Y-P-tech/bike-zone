@@ -410,11 +410,14 @@ class Command(BaseCommand):
 
             self.bike_data = bike_data
 
-            ddg.download(bike_data['bike_title'] + " color " +
-                         bike_data['color'] + " year " +
-                         str(bike_data['year']),
-                         max_urls=5,
-                         folder=self.folder_path)
+            try:
+                ddg.download(bike_data['bike_title'] + " color " +
+                             bike_data['color'] + " year " +
+                             str(bike_data['year']),
+                             max_urls=5,
+                             folder=self.folder_path)
+            except Exception as exc:
+                print(exc)
 
             # create a new Bike object with the data from the JSON
             bike = Bike.objects.create(

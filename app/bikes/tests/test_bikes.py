@@ -88,4 +88,15 @@ class TestBikesData(TestCase):
         response = self.client.get(url)
         self.assertContains(response, '4,000')
 
+    def test_bikes_dynamic_title(self):
+        """
+        Test that bikes page contains title Bike Zone |
+        """
+        # Get all the bikes ids
+        url = reverse('bikes')
+        response = self.client.get(url)
+
+        # Confirm that every bike details page contains Bike Zone | as title
+        self.assertContains(response, 'Bike Zone |')
+
 

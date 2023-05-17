@@ -1,3 +1,6 @@
+app/app/config.py
+app/
+
 *docx
 *.tmp
 /00_template

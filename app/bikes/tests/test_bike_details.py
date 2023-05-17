@@ -69,3 +69,20 @@ class TestPageDetails(TestCase):
                 if key == 'bike_title':
                     continue
                 self.assertEqual(str(getattr(bike_from_model.first(), key)), str(value))
+
+    def test_bike_details_dynamic_title(self):
+        """
+        Test that bike details page contains title Bike Zone |
+        """
+        # Get all the bikes ids
+        bike_ids = list(Bike.objects.values_list('id', flat=True))
+
+        for id in bike_ids:
+            url = reverse('bike_detail', args=[id])
+            response = self.client.get(url)
+
+            # Confirm that every bike details page contains Bike Zone | as title
+            self.assertContains(response, 'Bike Zone |')
+
+
+

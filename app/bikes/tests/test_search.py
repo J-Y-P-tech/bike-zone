@@ -107,3 +107,14 @@ class TestSearch(TestCase):
         self.assertEqual(len(response.context['bikes']), 1)
         # Check if the correct bike is returned
         self.assertEqual(response.context['bikes'][0].city, 'Las Vegas')
+
+    def test_search_dynamic_title(self):
+        """
+        Test that search page contains title Bike Zone |
+        """
+        # Get all the bikes ids
+        url = reverse('search')
+        response = self.client.get(url)
+
+        # Confirm that search page contains Bike Zone | as title
+        self.assertContains(response, 'Bike Zone |')

@@ -747,6 +747,7 @@ input[type=checkbox]:checked + label:before {
     height: 100px;
 }
 
+
 .header-ml {
     margin-left: 20px;
 }
@@ -9739,7 +9740,7 @@ input, input::-webkit-input-placeholder, textarea::-webkit-input-placeholder{
     background: #f0151f !important;
 }
 .contact-dealer.modal-header img{
-    width: 75% !important;
+    width: 40% !important;
 }
 
 .car-box .footer .cartype{

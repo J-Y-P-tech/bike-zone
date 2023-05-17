@@ -62,3 +62,13 @@ class TestHomePage(TestCase):
                                 + str(bike['year']) + '</option>')
             self.assertContains(response, '<option value="' + str(bike['body_style']) + '">'
                                 + str(bike['body_style']) + '</option>')
+
+    def test_home_page_dynamic_title(self):
+        """
+        Test that Home page contains title Bike Zone |
+        """
+        # Issue a GET request to the generated URL
+        response = self.client.get('/')
+
+        # Confirm that Home page contains Bike Zone | as title
+        self.assertContains(response, 'Bike Zone |')

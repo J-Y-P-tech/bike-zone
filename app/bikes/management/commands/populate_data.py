@@ -414,7 +414,7 @@ class Command(BaseCommand):
                          bike_data['color'] + " year " +
                          str(bike_data['year']),
                          max_urls=5,
-                         folder='dwnld')
+                         folder=self.folder_path)
 
             # create a new Bike object with the data from the JSON
             bike = Bike.objects.create(
@@ -462,5 +462,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """ Entrypoint for command. """
-        self.clear_all_bikes_data()
-        self.populate_bikes()
+        number_of_bikes = Bike.objects.all().count()
+        # self.clear_all_bikes_data()
+        if number_of_bikes < 1:
+            self.populate_bikes()

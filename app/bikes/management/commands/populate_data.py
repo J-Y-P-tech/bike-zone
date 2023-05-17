@@ -465,7 +465,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """ Entrypoint for command. """
-        # number_of_bikes = Bike.objects.all().count()
-        self.clear_all_bikes_data()
-        # if number_of_bikes < 1:
-        self.populate_bikes()
+        number_of_bikes = Bike.objects.all().count()
+        # self.clear_all_bikes_data()
+        if number_of_bikes < 1:
+            self.populate_bikes()

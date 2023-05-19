@@ -6,7 +6,7 @@ jobs:
     name: Tests
     runs-on: ubuntu-20.04
     env:
-      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      DJANGO_SECRET_KEY: '${{ secrets.DJANGO_SECRET_KEY }}'
     steps:
       - name: Print secret key
         run: echo "${{ secrets.DJANGO_SECRET_KEY }}"

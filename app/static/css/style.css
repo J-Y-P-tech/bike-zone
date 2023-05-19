@@ -9770,6 +9770,23 @@ a.nav-link.active{
 }
 
 
+.text-facebook {
+    color: #222e56;
+}
+
+.text-google {
+    color: #7d0e1e;
+}
+
+.btn-facebook {
+    background-color: #222e56;
+    border-radius: 5px;
+}
+
+.btn-google {
+    background-color: #7d0e1e;
+    border-radius: 5px;
+}
 
 
 

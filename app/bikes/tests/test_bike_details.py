@@ -83,6 +83,3 @@ class TestPageDetails(TestCase):
 
             # Confirm that every bike details page contains Bike Zone | as title
             self.assertContains(response, 'Bike Zone |')
-
-
-

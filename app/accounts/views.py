@@ -3,6 +3,7 @@ from django.contrib import messages, auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import BaseUserManager
+from contacts.models import Contact
 
 
 def login(request):
@@ -17,7 +18,7 @@ def login(request):
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'You are now logged in.')
-            return redirect('home')
+            return redirect('dashboard')
         else:
             messages.error(request, 'Invalid login credentials')
             return redirect('login')
@@ -47,7 +48,7 @@ def register(request):
                 # Log in automatically after user registered successfully
                 auth.login(request, user)
                 messages.success(request, 'You are now logged in.')
-                return redirect('home')
+                return redirect('dashboard')
 
                 # If we don't want auto log in comment the upper part and uncomment this one
                 # messages.success(request, 'You are registered successfully.')
@@ -67,5 +68,11 @@ def logout(request):
     return redirect('home')
 
 
+@login_required(login_url='login')
 def dashboard(request):
-    return render(request, 'accounts/dashboard.html')
+    user_inquiry = Contact.objects.order_by('-create_date').filter(user_id=request.user.id)
+
+    data = {
+        'inquiries': user_inquiry,
+    }
+    return render(request, 'accounts/dashboard.html', data)

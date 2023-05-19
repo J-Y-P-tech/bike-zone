@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+
 # from .config import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,7 +22,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h4$p#!7*fogx5ann3)k86&wg28sgn0pn(rtn_fia-(*84z+%=$'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -39,6 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'accounts',
     'contacts',
+
+    # Providers
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
+
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -143,3 +152,8 @@ from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
+
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = 'dashboard'
+# SOCIALACCOUNT_LOGIN_ON_GET = False

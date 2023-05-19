@@ -28,8 +28,10 @@ class TestAccountPages(TestCase):
         # Issue a GET request to the generated URL
         response = self.client.get(url)
 
-        # Assert that the response status code is 200 indicating a successful response
-        self.assertEqual(response.status_code, 200)
+        # Assert that the response status code is 302
+        # indicating a user is redirected to login page
+        # because he/she has not logged in
+        self.assertEqual(response.status_code, 302)
 
 
 class TestLogin(TestCase):
@@ -63,7 +65,7 @@ class TestLogin(TestCase):
 
         # 302 is the status code for redirect
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('dashboard'))
 
     def test_login_unsuccessful(self):
         """ Test user with wrong credentials to be redirected to login page
@@ -99,7 +101,7 @@ class TestLogin(TestCase):
             self.assertEqual(response.status_code, 302)
             # Confirm that user has been redirected to home which means
             # a successful login
-            self.assertRedirects(response, reverse('home'))
+            self.assertRedirects(response, reverse('dashboard'))
 
     def test_message_successful_login(self):
         """ Test if html returns 'You are now logged in.'
@@ -166,7 +168,7 @@ class TestRegister(TestCase):
 
         # Confirm that user has been redirected to home which means
         # a successful login
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('dashboard'))
 
         # Confirm that user exists
         user_exists = User.objects.filter(username='testregistration@example.com').exists()
@@ -213,8 +215,8 @@ class TestRegister(TestCase):
 
         # We get 2 messages: 1 for registering the first user
         # and 1 for the second attempt for registration
-        self.assertEqual(len(messages), 2)
-        self.assertEqual(str(messages[1]), 'Email already exists!')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'Email already exists!')
 
     def test_password_confirm_missmatch(self):
         """
@@ -267,7 +269,7 @@ class TestRegister(TestCase):
 
         # Confirm that user has been redirected to register which means
         # a login was not successful
-        self.assertRedirects(response, reverse('home'))
+        self.assertRedirects(response, reverse('dashboard'))
 
         # Should have only 1 registered user with this email
         number_users = User.objects.filter(username='testregistration@example.com').count()

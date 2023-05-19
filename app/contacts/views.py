@@ -39,6 +39,7 @@ def inquiry(request):
 
         admin_info = User.objects.filter(is_superuser=True).first()
         admin_email = admin_info.email
+        print(admin_email)
         send_mail(
             'New Car Inquiry',
             'You have a new inquiry for the bike ' + bike_title + '. Please login to your admin panel for more info.',

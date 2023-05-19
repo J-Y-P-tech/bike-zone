@@ -24,6 +24,7 @@ urlpatterns = [
     path('bikes/', include('bikes.urls')),
     path('accounts/', include('accounts.urls')),
     path('contacts/', include('contacts.urls')),
+    path('socialaccounts/', include('allauth.urls')),
 
 ]
 """
